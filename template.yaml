@@ -25,6 +25,27 @@ Resources:
             RestApiId: !Ref MyAPI
             Path: "/"
             Method: GET
+            
+  GetPet:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getPet
+      Handler: pets.getPet
+      Runtime: python3.8
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PetsTable
+      Environment:
+        Variables:
+          PETS_TABLE: !Ref PetsTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/pet/{pet_id}"
+            Method: GET
   
   MyAPI:
     Type: AWS::Serverless::Api
