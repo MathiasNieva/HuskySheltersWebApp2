@@ -1,0 +1,11 @@
+openapi: 3.0.0
+
+paths:
+  /:
+    get:
+      summary: This endpoint returns the list of pets
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getPets/invocations"
+        httpMethod: "POST"

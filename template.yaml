@@ -1,0 +1,97 @@
+
+AWSTemplateFormatVersion : '2010-09-09'
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Description: husky shelters web app
+Resources:
+  GetPets:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getPets
+      Handler: pets.getPets
+      Runtime: python3.8
+      CodeUri: package/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PetsTable
+      Environment:
+        Variables:
+          PETS_TABLE: !Ref PetsTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyAPI
+            Path: "/"
+            Method: GET
+  
+  MyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: husky-shelters-web-app-api
+      StageName: prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: swagger.yaml
+
+  PetsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: husky-shelters-web-app
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: petId
+          KeyType: HASH
+        - AttributeName: type
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: petId
+          AttributeType: S
+        - AttributeName: type
+          AttributeType: S
+          
+          
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: PublicRead
+      BucketName: husky-shelters-web-app2
+      MetricsConfigurations:
+        - Id: EntireBucket
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+        RoutingRules:
+          - RoutingRuleCondition:
+              HttpErrorCodeReturnedEquals: '404'
+              KeyPrefixEquals: out1/
+            RedirectRule:
+              HostName: ec2-11-22-333-44.compute-1.amazonaws.com
+              ReplaceKeyPrefixWith: report-404/
+    DeletionPolicy: Retain
+
+    
+    
+    
+  SampleBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref S3Bucket
+                - /*
+            Principal: '*'
+
