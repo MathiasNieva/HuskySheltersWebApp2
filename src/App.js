@@ -57,15 +57,11 @@ class App extends Component {
 		this.setState({pets:body, isLoading:false})
 	}
 
-	getImages(petPK){
-		this.setState({images:[{
-			"Age": "2",
-			"HealthStatus": "Healthy",
-			"Location": "London",
-			"Name": "Lucas",
-			"PK": "pet_001",
-			"SK": "image1"
-		  }], isLoading:false})
+	async getImages(petPK){
+		const response = await fetch('https://7oh44m822c.execute-api.us-east-1.amazonaws.com/prod');
+		const body = await response.json();
+		console.log(body)
+		this.setState({images:body, isLoading:false})
 	}
 
 	render() {
@@ -92,7 +88,7 @@ class App extends Component {
 		let imgs = 
 		allImages.map( pet => 
 			<tr key={pet.PK}>
-				<td><img src="https://picsum.photos/200?image=2" alt="a"></img></td>
+				<td><img src={pet.SK} alt="a"></img></td>
 			</tr>
 		)
 
