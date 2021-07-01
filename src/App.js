@@ -58,7 +58,8 @@ class App extends Component {
 	}
 
 	async getImages(petPK){
-		const response = await fetch('https://7oh44m822c.execute-api.us-east-1.amazonaws.com/prod');
+		this.setState({images:[], isLoading:false})
+		const response = await fetch('https://7oh44m822c.execute-api.us-east-1.amazonaws.com/prod/pet/'+petPK);
 		const body = await response.json();
 		console.log(body)
 		this.setState({images:body, isLoading:false})
@@ -88,7 +89,7 @@ class App extends Component {
 		let imgs = 
 		allImages.map( pet => 
 			<tr key={pet.PK}>
-				<td><img src={pet.SK} alt="a"></img></td>
+				<td><img src={"/"+pet.PK+"/"+pet.SK} alt={"/"+pet.PK+"/"+pet.SK}></img></td>
 			</tr>
 		)
 
