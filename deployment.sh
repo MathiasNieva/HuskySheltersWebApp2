@@ -1,5 +1,5 @@
 #!/bin/bash
-DEPLOYMENT_BUCKET="husky-shelters-web-app-stack"
+DEPLOYMENT_BUCKET="husky-shelters-web-app-stack3"
 
 while getopts ":bdp" OPTION; do
     case $OPTION in
@@ -33,5 +33,5 @@ fi
 
 if [[ $DEPLOY == 1 ]]
 then
-    aws cloudformation deploy --template-file packaged-template.json --stack-name husky-shelters-web-app --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation deploy --template-file packaged-template.json --stack-name husky-shelters-web-app2 --capabilities CAPABILITY_NAMED_IAM
 fi

@@ -1,17 +1,21 @@
+  
 import json
 import boto3
 import os
+from boto3.dynamodb.conditions import Key
 
 pets_table = os.environ['PETS_TABLE']
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(pets_table)
 
-def getPets(event, context):
+def getAllPets(event, context):
     print(json.dumps({"running": True}))
     print(json.dumps(event))
     
-    response = table.scan()
+    response = table.scan(
+        FilterExpression = Key('SK').eq('Dog') | Key('SK').eq('Cat')
+    )
     
     items = response['Items']
     print(items)

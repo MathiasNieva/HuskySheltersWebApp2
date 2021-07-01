@@ -8,8 +8,8 @@ Resources:
   GetPets:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: getPets
-      Handler: pets.getPets
+      FunctionName: getAllPets
+      Handler: pets.getAllPets
       Runtime: python3.8
       CodeUri: package/
       Policies:
@@ -29,7 +29,7 @@ Resources:
   MyAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: husky-shelters-web-app-api
+      Name: husky-shelters-web-app-api2
       StageName: prod
       DefinitionBody:
         Fn::Transform:
@@ -40,58 +40,62 @@ Resources:
   PetsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: husky-shelters-web-app
+      TableName: husky-shelters-web-app2
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       KeySchema:
-        - AttributeName: petId
+        - AttributeName: PK
           KeyType: HASH
-        - AttributeName: type
+        - AttributeName: SK
           KeyType: RANGE
       AttributeDefinitions:
-        - AttributeName: petId
+        - AttributeName: PK
           AttributeType: S
-        - AttributeName: type
+        - AttributeName: SK
           AttributeType: S
+        - AttributeName: Name
+          AttributeType: S
+        - AttributeName: HealthStatus
+          AttributeType: S
+        - AttributeName: Age
+          AttributeType: S
+        - AttributeName: Location
+          AttributeType: S
+      LocalSecondaryIndexes: 
+        - IndexName: NameLSI
+          KeySchema: 
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: Name
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: HealthStatusLSI
+          KeySchema: 
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: HealthStatus
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: AgeLSI
+          KeySchema: 
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: Age
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: LocationLSI
+          KeySchema: 
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: Location
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
           
           
-  S3Bucket:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      AccessControl: PublicRead
-      BucketName: husky-shelters-web-app2
-      MetricsConfigurations:
-        - Id: EntireBucket
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: error.html
-        RoutingRules:
-          - RoutingRuleCondition:
-              HttpErrorCodeReturnedEquals: '404'
-              KeyPrefixEquals: out1/
-            RedirectRule:
-              HostName: ec2-11-22-333-44.compute-1.amazonaws.com
-              ReplaceKeyPrefixWith: report-404/
-    DeletionPolicy: Retain
-
-    
-    
-    
-  SampleBucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - 's3:GetObject'
-            Effect: Allow
-            Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
-                - !Ref S3Bucket
-                - /*
-            Principal: '*'
+  
 
